@@ -17,9 +17,9 @@ this is a test for my first post.
 
 
 hugo 的重要目录和文件
-config.toml
-content/
-static/
-themes/
-layouts/
+- config.toml
+- content/
+- static/
+- themes/
+- layouts/
 
