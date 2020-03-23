@@ -22,3 +22,4 @@ content/
 static/
 themes/
 layouts/
+
