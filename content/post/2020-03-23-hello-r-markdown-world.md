@@ -9,7 +9,7 @@ tags:
   - blogdown
 ---
 
-I love you 
+I like R and Rstudio.
 
 this is a test for my first post.
 
