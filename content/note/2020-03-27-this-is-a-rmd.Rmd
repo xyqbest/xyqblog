@@ -1,0 +1,13 @@
+---
+title: this is a rmd
+author: xyy
+date: '2020-03-27'
+slug: this-is-a-rmd
+categories: []
+tags: []
+---
+
+
+# this is a rmd
+## this is a rmd
+
