@@ -19,6 +19,8 @@ this is a test for my first post.
 
 这是俺的第一个博客测试。
 
+>nihao 
+>你好
 
 Hugo 的重要目录和文件
 - config.toml
