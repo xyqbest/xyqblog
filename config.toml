@@ -33,4 +33,4 @@ footnotereturnlinkcontents = "↩"
 
 [params]
     description = "A website built through Hugo and blogdown."
-    footer = "&copy; [Yuquan Xu](https://google.com) 2019 -- 2020 | [iBIDS](http://ibids.cn) "
+    footer = "&copy; [Yuquan Xu](https://xyq.netlify.com) 2019 -- 2020 | [iBIDS](http://ibids.cn) "
