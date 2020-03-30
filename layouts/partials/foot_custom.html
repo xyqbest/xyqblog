@@ -1,4 +1,4 @@
-{{ if .IsPage }}
+{{ if and .IsPage (not .Params.disable_comments) }}
   {{ template "_internal/disqus.html" . }}
 {{ end }}
 <!--

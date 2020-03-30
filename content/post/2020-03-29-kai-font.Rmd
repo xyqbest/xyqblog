@@ -2,10 +2,10 @@
 title: kai font
 author: xyy
 date: '2020-03-29'
-slug: 楷体测试
+slug: kai-font
 categories: []
 tags: []
-disable_comments: false
+disable_comments: true
 ---
 
 
