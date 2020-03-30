@@ -1,5 +1,6 @@
-{{ template "_internal/disqus.html" . }}
-
+{{ if .IsPage }}
+  {{ template "_internal/disqus.html" . }}
+{{ end }}
 <!--
 <script src="//yihui.name/js/math-code.js"></script>
 <script async src="//mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
