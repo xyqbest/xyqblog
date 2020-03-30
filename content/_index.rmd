@@ -3,4 +3,5 @@ title: Home
 ---
 ## _Keep it simple, but not simpler_
 
+>一时摸鱼一时爽，一直摸鱼一直爽 :joy:
 
