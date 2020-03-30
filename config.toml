@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "https://xyq.netlify.com"
 languageCode = "en-us"
 title = "A minimal Hugo website"
 theme = "hugo-xmin"
@@ -7,7 +7,7 @@ disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 footnotereturnlinkcontents = "↩"
 enableEmoji  = true
-
+disqusShortname = "xyq-netlify-com""
 
 [permalinks]
     post = "/post/:year/:month/:day/:slug/"
