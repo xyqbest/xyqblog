@@ -1,6 +1,6 @@
 ---
 title: "关于"
-
+disable_comments: true
 ---
 
 
@@ -23,7 +23,10 @@ title: "关于"
     - 爱看一些高分经典剧集
     - 很少看新剧
 
+# 有趣的人
 
+- [Hadley Wickham](http://hadley.nz/)： 制作了各种有意思的数据科学的R包，他的数据哲学挺有意思。
+- [Yuihui Xie]() ：制作了各种与写作有关的R包。
 
 # 本站架构
 
@@ -33,7 +36,7 @@ title: "关于"
 
 ## 软件
 
-- [R 语言](https://www.r-project.org)：一个优秀的合适非CS科班出身的语言工具
-- [Hugo](http://gohugo.io)：静态网站生成器
+- [R 语言](https://www.r-project.org)：一个优秀的适合非计算机科班出身的人使用的编程语言
+- [Hugo](http://gohugo.io)：简洁的静态网站生成器
 
 未完待续。
