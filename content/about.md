@@ -3,8 +3,12 @@ title: "关于"
 disable_comments: true
 ---
 
-
 # 我是谁
+
+- 管理科学与工程在读博士生
+- 做一些大数据相关工作，比如数据分析
+- 时空轨迹数据分析
+
 
 我欣赏简洁的美，无论它来自写作、设计。
 
@@ -30,8 +34,11 @@ disable_comments: true
 
 # 本站架构
 
-本站目前采用 Hugo 作为后台系统，使用R 包 [blogdown](https://github.com/rstudio/blogdown)实现。
-博客模板基于 [yihui](https://yihui.org)大佬的 [hugo-xmin](https://github.com/yihui/hugo-xmin)修改而来。因为他的设计非常简洁，有很大的修改空间。
+本站目前采用 Hugo生成静态网页，使用R包
+[blogdown](https://github.com/rstudio/blogdown)实现。
+博客模板基于
+[yihui](https://yihui.org)的
+[hugo-xmin](https://github.com/yihui/hugo-xmin)修改而来。此模板设计简洁，有很大的把玩空间。
 
 
 ## 软件
