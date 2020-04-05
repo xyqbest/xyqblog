@@ -10,8 +10,10 @@ title: Home
 
 这是原版jpg
 ![Xi'an city wall](img/Xi'an.jpg)
+
 1080jpg
 ![Xi'an city wall](img/Xi'an2.jpg)
+
 1080png
 ![Xi'an city wall](img/Xi'an.png)
 
