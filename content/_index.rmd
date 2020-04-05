@@ -5,3 +5,4 @@ title: Home
 
 >一时摸鱼一时爽，一直摸鱼一直爽 :joy:
 
+![High Sierra: from macOS background image](img/High Sierra.jpg)
