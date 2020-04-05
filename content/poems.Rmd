@@ -13,12 +13,12 @@ body { counter-reset: poems; }
 h2::before { counter-increment: poems; content: counter(poems) ". "; }
 </style>
 
+平时读到一些有意思的句子就会贴到到手机里存着，把多年攒的句子放在这个页面。
+有诗歌也有单个句子，并没有考究出处。
+有的可能比较中二，年代有点久远。
+年轻时候谁不中二一点。
 
-> UNIX was not designed to stop its users from doing stupid things,
-> as that would also stop them from doing clever things.
->
-> — Doug Gwyn
- 
+
 <center>
 <font face="楷体">
 
@@ -617,7 +617,7 @@ __谁无暴风劲雨时，守得云开见月明。__
 >
 >为自由开路者， 不可使他困顿于荆棘！
 
-> 中年以后的男人，时常会觉得孤独，因为他一睁开眼睛，周围都是要依靠他的人，却没有他可以依靠的人。……他只能赤身露体躺在床上，紧紧抱着情人，孤独得就像是一枚回形针。
+> 中年以后的男人，时常会觉得孤独，因为他一睁开眼睛，周围都是要依靠他的人，却没有他可以依靠的人。
 >
 > —张爱玲
 
