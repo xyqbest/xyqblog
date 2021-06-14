@@ -5,9 +5,7 @@ title: Home
 
 >一时摸鱼一时爽，一直摸鱼一直爽 :joy:
 
-在西安求学十年
-
-一个自娱自乐的博客
+这是一个自娱自乐的博客
 
 
 ![Xi'an city wall](img/Xi'an1920X1440.jpg)
