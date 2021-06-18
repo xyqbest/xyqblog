@@ -29,8 +29,12 @@ shall denote such a matrix by `$\mathsf{x}$`, which is a column vector whose nth
 Note that `$\mathsf{x}$` (which has dimensionality N) uses a different typeface to distinguish it
 from x (which has dimensionality D).
 
-## 1.1 
+# 1. Introduction
+term 收集
+- training set
+- target vector 
 
+## 1.1. Example: Polynomial Curve Fitting
 
 
 
