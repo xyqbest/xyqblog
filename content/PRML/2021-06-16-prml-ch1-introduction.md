@@ -11,7 +11,7 @@ disable_comments: yes
 ---
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-## 0.数学符号的约定
+## 0. 数学符号的约定
 
 Vectors are denoted by lower case bold Roman letters such as
 `$x$`, and all vectors are assumed to be column vectors. A superscript T denotes the
@@ -29,10 +29,15 @@ shall denote such a matrix by `$\mathsf{x}$`, which is a column vector whose nth
 Note that `$\mathsf{x}$` (which has dimensionality N) uses a different typeface to distinguish it
 from x (which has dimensionality D).
 
-# 1. Introduction
+## 1. Introduction
 term 收集
 - training set
 - target vector 
+- test set
+- generalization
+- feature extraction
+
+
 
 ## 1.1. Example: Polynomial Curve Fitting
 
