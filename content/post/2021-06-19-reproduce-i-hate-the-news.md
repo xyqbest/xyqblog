@@ -10,7 +10,7 @@ tags:
 disable_comments: yes
 ---
 
-太喜欢这个文章，不得不转载一下.
+Aaron Swartzd的这个文章挺有趣的，转载一下。
 
 ## [I Hate the News](http://www.aaronsw.com/weblog/hatethenews)
 
