@@ -1,0 +1,149 @@
+---
+title: HWMIS培训-R与回归
+author: Yuquan Xu
+date: '2021-12-01'
+slug: hwmis-r
+categories:
+  - R
+  - 组会分享
+tags:
+  - R
+disable_comments: yes
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="r的安装与使用" class="section level2">
+<h2>R的安装与使用</h2>
+<p>R语言来自S语言，是S语言的一个变种。S语言由Rick Becker, John Chambers等人在贝尔实验室开发， 著名的C语言、Unix系统也是贝尔实验室开发的。R是一个自由软件，GPL授权， 最初由新西兰Auckland 大学的Ross Ihaka 和 Robert Gentleman于1997年发布， R实现了与S语言基本相同的功能和统计功能。 现在由R核心团队开发，但全世界的用户都可以贡献软件包。 R的网站: <a href="http://www.r-project.org/">http://www.r-project.org/</a></p>
+<p><strong>R语言的特点</strong></p>
+<ul>
+<li>自由软件，免费、开放源代码，支持各个主要计算机系统；</li>
+<li>完整的程序设计语言，基于函数和对象，可以自定义函数，调入C、C++、Fortran编译的代码；</li>
+<li>具有完善的数据类型，如向量、矩阵、因子、数据集、一般对象等，支持缺失值，代码像伪代码一样简洁、可读;</li>
+<li>强调交互式数据分析，支持复杂算法描述，图形功能强;</li>
+<li>实现了经典的、现代的统计方法，如参数和非参数假设检验、线性回归、广义线性回归、非线性回归、可加模型、树回归、混合模型、方差分析、判别、聚类、时间序列分析等。</li>
+<li>统计科研工作者广泛使用R进行计算和发表算法。R有上万扩展包(截止2021年7月在R扩展包主要分发网站CRAN上有一万七千多个)。</li>
+</ul>
+<p><strong>下载与安装</strong></p>
+<p>以MS Windows操作系统为例。R的主网站在<a href="https://www.r-project.org/">https://www.r-project.org/</a>。 从CRAN的镜像网站下载软件，其中一个镜像如<a href="https://mirrors.tuna.tsinghua.edu.cn/CRAN/">https://mirrors.tuna.tsinghua.edu.cn/CRAN/</a>。 选“Download R for Windows-base-Download R 4.1.0 for windows” (4.1.0是版本号，应下载网站上给出的最新版本）链接进行下载。 在“Download R for Windows”链接的页面， 除了base为R的安装程序， 还有contrib为R附加的扩展软件包下载链接（一般不需要从这里下载）， 以及Rtools链接， 是在R中调用C、C++和Fortran程序代码时需要用的编译工具。</p>
+<p>RStudio（<a href="https://www.rstudio.com/">https://www.rstudio.com/</a>）是功能更强的一个R图形界面， 在安装好R的官方版本后安装RStudio可以更方便地使用R。</p>
+<p>参考资料</p>
+<ul>
+<li>Hadley Wickham and Garrett Grolemund(2017) “R for Data Science”，<a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a>, O’Reilly, 讲基本的数据整理、汇总。</li>
+<li>Hadley Wickham(2019) “Advanced R,” 2nd ed., <a href="https://adv-r.hadley.nz/">https://adv-r.hadley.nz/</a>, Chapman &amp; Hall/CRC The R Series，高级R编程，属于对R高级编程技术的讲解。</li>
+<li>Hadley Wickham(2016) ggplot2 Elegant Graphics for Data Analysis, 2nd ed., <a href="https://ggplot2-book.org/">https://ggplot2-book.org/</a>, Springer，优雅易用的R作图功能。</li>
+<li>Susan Holmes, Wolfgang Huber(2020) Modern Statistics for Modern Biology, <a href="https://www.huber.embl.de/msmb/index.html">https://www.huber.embl.de/msmb/index.html</a>, R的统计功能在生物学中的应用</li>
+<li>R语言教程<a href="https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html">https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html</a></li>
+</ul>
+<pre class="r"><code>load(url(&quot;https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/data/reg-data.RData&quot;))</code></pre>
+</div>
+<div id="r进行基本的ols回归操作" class="section level2">
+<h2>R进行基本的OLS回归操作</h2>
+<pre class="r"><code>set.seed(1)
+nsamp &lt;- 30
+x &lt;- runif(nsamp, -10, 10)
+y &lt;- 20 + 0.5*x + rnorm(nsamp,0,0.5)
+plot(x, y)
+abline(lm(y ~ x), col=&quot;red&quot;, lwd=2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>set.seed(1)
+nsamp &lt;- 30
+x &lt;- runif(nsamp, -10, 10)
+y &lt;- 20 + 0.5*x + rnorm(nsamp,0,0.5)
+d &lt;- data.frame(x=x, y=y)
+lm1 &lt;- lm(y ~ x, data=d); lm1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x, data = d)
+## 
+## Coefficients:
+## (Intercept)            x  
+##     20.0388       0.4988</code></pre>
+<pre class="r"><code>summary(lm1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x, data = d)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.03030 -0.16436 -0.05741  0.29511  0.64046 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 20.03883    0.07226   277.3   &lt;2e-16 ***
+## x            0.49876    0.01244    40.1   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3956 on 28 degrees of freedom
+## Multiple R-squared:  0.9829, Adjusted R-squared:  0.9823 
+## F-statistic:  1608 on 1 and 28 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>对d.class数据集，建立体重对身高的回归方程:</p>
+<pre class="r"><code>d.class</code></pre>
+<pre><code>##       name sex age height weight
+## 1    Alice   F  13   56.5   84.0
+## 2    Becka   F  13   65.3   98.0
+## 3     Gail   F  14   64.3   90.0
+## 4    Karen   F  12   56.3   77.0
+## 5    Kathy   F  12   59.8   84.5
+## 6     Mary   F  15   66.5  112.0
+## 7    Sandy   F  11   51.3   50.5
+## 8   Sharon   F  15   62.5  112.5
+## 9    Tammy   F  14   62.8  102.5
+## 10  Alfred   M  14   69.0  112.5
+## 11    Duke   M  14   63.5  102.5
+## 12   Guido   M  15   67.0  133.0
+## 13   James   M  12   57.3   83.0
+## 14 Jeffrey   M  13   62.5   84.0
+## 15    John   M  12   59.0   99.5
+## 16  Philip   M  16   72.0  150.0
+## 17  Robert   M  12   64.8  128.0
+## 18  Thomas   M  11   57.5   85.0
+## 19 William   M  15   66.5  112.0</code></pre>
+<pre class="r"><code>lm2 &lt;- lm(weight ~ height, data=d.class)
+summary(lm2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = weight ~ height, data = d.class)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -17.6807  -6.0642   0.5115   9.2846  18.3698 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -143.0269    32.2746  -4.432 0.000366 ***
+## height         3.8990     0.5161   7.555 7.89e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.23 on 17 degrees of freedom
+## Multiple R-squared:  0.7705, Adjusted R-squared:  0.757 
+## F-statistic: 57.08 on 1 and 17 DF,  p-value: 7.887e-07</code></pre>
+</div>
+<div id="ols回归的诊断" class="section level2">
+<h2>OLS回归的诊断</h2>
+<p><a href="https://zhuanlan.zhihu.com/p/341318994">R语言统计-回归篇：回归诊断</a></p>
+<ul>
+<li><p><strong>线性</strong> 若因变量与自变量线性相关，那么残差值与预测（拟合）值就没有任何系统关联。 换句话说，除了白噪声，模型应该包含数据中所有的系统方差。在“残差图与拟合图” （Residuals vs Fitted，左上）中可以清楚地看到一个曲线关系，这暗示着你可能需要对回 归模型加上一个二次项。</p></li>
+<li><p><strong>独立性</strong> 你无法从这些图中分辨出因变量值是否相互独立，只能从收集的数据中来验证。 上面的例子中，没有任何先验的理由去相信一位女性的体重会影响另外一位女性的体重。 假若你发现数据是从一个家庭抽样得来的，那么可能必须要调整模型独立性的假设。</p></li>
+<li><p><strong>正态性</strong> 当预测变量值固定时，因变量成正态分布，则残差值（预测与真实的差值）也应该是一个均值为0的正态分布。“正态Q-Q图”（Normal Q-Q，右上）是在正态分布对应的值下，标准化残差的概图。若满足正态假设，那么图上的点应该落在呈45度角的直线上；若不是如此，那么 就违反了正态性的假设。</p></li>
+<li><p><strong>同方差性</strong> 若满足不变方差假设，那么在“位置尺度图”（Scale-Location Graph，左下） 中，水平线周围的点应该随机分布。该图似乎满足此假设。 最后一幅“残差与杠杆图”（Residuals vs Leverage，右下）提供了你可能关注的单个观测点的信息。从图形可以鉴别出离群点、高杠杆值点和强影响点。</p></li>
+</ul>
+<pre class="r"><code>plot(lm2)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-2.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-3.png" width="672" /><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-4.png" width="672" />
+第一幅图是残差对预测值散点图， 散点应该随机在0线上下波动，不应该有曲线模式、分散程度增大模式、 特别突出的离群点等情况。</p>
+<p>第二幅图是残差的正态QQ图， 散点接近于直线时可以认为模型误差项的正态分布假定是合理的。</p>
+<p>第三幅图是误差大小(标准化残差绝对值的平方根)对拟合值的图形， 可以判断方差齐性假设(方差
+<code>$\sigma$</code>不变)。</p>
+<p>第四个幅是残差对杠杆量图，并叠加了Cook距离等值线。 杠杆量代表了回归自变量对结果的影响大小， 超过<code>$4/n$</code>的值是需要重视的。 Cook距离考察删去第个观测对回归结果的影响， 如果有超出两条虚线范围之外的点， 就可能是强影响点。</p>
+<p>下面来详细介绍。
+一个观测点是离群点，表明拟合回归模型对其预测效果不佳（产生了巨大的或正或负的残差）
+一个观测点有很高的杠杆值，表明它是一个异常的预测变量值的组合。也就是说，在预测变量空间中，它是一个离群点。因变量值不参与计算一个观测点的杠杆值。
+一个观测点是强影响点（influential observation），表明它对模型参数的估计产生的影响过大，非常不成比例。强影响点可以通过Cook距离即Cook‘s D统计量来鉴别。</p>
+</div>
+<div id="r的绘图" class="section level2">
+<h2>R的绘图</h2>
+</div>
