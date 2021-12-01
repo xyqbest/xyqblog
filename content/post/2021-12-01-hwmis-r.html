@@ -1,0 +1,1153 @@
+---
+title: HWMIS培训 - R与回归
+author: Yuquan Xu
+date: '2021-12-01'
+slug: hwmis-r
+categories:
+  - 组会分享
+  - R
+tags:
+  - R
+disable_comments: yes
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="r的安装与使用" class="section level2">
+<h2>R的安装与使用</h2>
+<p>R语言来自S语言，是S语言的一个变种。S语言由Rick Becker, John Chambers等人在贝尔实验室开发， 著名的C语言、Unix系统也是贝尔实验室开发的。R是一个自由软件，GPL授权， 最初由新西兰Auckland 大学的Ross Ihaka 和 Robert Gentleman于1997年发布， R实现了与S语言基本相同的功能和统计功能。 现在由R核心团队开发，但全世界的用户都可以贡献软件包。 R的网站: <a href="http://www.r-project.org/">http://www.r-project.org/</a></p>
+<p><strong>R语言的特点</strong></p>
+<ul>
+<li>自由软件，免费、开放源代码，支持各个主要计算机系统；</li>
+<li>完整的程序设计语言，基于函数和对象，可以自定义函数，调入C、C++、Fortran编译的代码；</li>
+<li>具有完善的数据类型，如向量、矩阵、因子、数据集、一般对象等，支持缺失值，代码像伪代码一样简洁、可读;</li>
+<li>强调交互式数据分析，支持复杂算法描述，图形功能强;</li>
+<li>实现了经典的、现代的统计方法，如参数和非参数假设检验、线性回归、广义线性回归、非线性回归、可加模型、树回归、混合模型、方差分析、判别、聚类、时间序列分析等。</li>
+<li>统计科研工作者广泛使用R进行计算和发表算法。R有上万扩展包(截止2021年7月在R扩展包主要分发网站CRAN上有一万七千多个)。</li>
+</ul>
+<p><strong>下载与安装</strong></p>
+<p>以MS Windows操作系统为例。R的主网站在<a href="https://www.r-project.org/">https://www.r-project.org/</a>。 从CRAN的镜像网站下载软件，其中一个镜像如<a href="https://mirrors.tuna.tsinghua.edu.cn/CRAN/">https://mirrors.tuna.tsinghua.edu.cn/CRAN/</a>。 选“Download R for Windows-base-Download R 4.1.0 for windows” (4.1.0是版本号，应下载网站上给出的最新版本）链接进行下载。 在“Download R for Windows”链接的页面， 除了base为R的安装程序， 还有contrib为R附加的扩展软件包下载链接（一般不需要从这里下载）， 以及Rtools链接， 是在R中调用C、C++和Fortran程序代码时需要用的编译工具。</p>
+<p>RStudio（<a href="https://www.rstudio.com/">https://www.rstudio.com/</a>）是功能更强的一个R图形界面， 在安装好R的官方版本后安装RStudio可以更方便地使用R。</p>
+<p>参考资料</p>
+<ul>
+<li>Hadley Wickham and Garrett Grolemund(2017) “R for Data Science”，<a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a>, O’Reilly, 讲基本的数据整理、汇总。</li>
+<li>Hadley Wickham(2019) “Advanced R,” 2nd ed., <a href="https://adv-r.hadley.nz/">https://adv-r.hadley.nz/</a>, Chapman &amp; Hall/CRC The R Series，高级R编程，属于对R高级编程技术的讲解。</li>
+<li>Hadley Wickham(2016) ggplot2 Elegant Graphics for Data Analysis, 2nd ed., <a href="https://ggplot2-book.org/">https://ggplot2-book.org/</a>, Springer，优雅易用的R作图功能。</li>
+<li>Susan Holmes, Wolfgang Huber(2020) Modern Statistics for Modern Biology, <a href="https://www.huber.embl.de/msmb/index.html">https://www.huber.embl.de/msmb/index.html</a>, R的统计功能在生物学中的应用</li>
+<li>R语言教程<a href="https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html">https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html</a>本教程的搬运</li>
+</ul>
+<pre class="r"><code>load(url(&quot;https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/data/reg-data.RData&quot;))</code></pre>
+</div>
+<div id="r进行基本的ols回归操作" class="section level2">
+<h2>R进行基本的OLS回归操作</h2>
+<p>直观上看，要找最优的直线使得直线<code>$y=ax+b$</code>与观测到的点最接近。 例如：</p>
+<pre class="r"><code>set.seed(1)
+nsamp &lt;- 30
+x &lt;- runif(nsamp, -10, 10)
+y &lt;- 20 + 0.5*x + rnorm(nsamp,0,0.5)
+plot(x, y)
+abline(lm(y ~ x), col=&quot;red&quot;, lwd=2)</code></pre>
+<p><img src="/post/2021-12-01-hwmis-r_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>设数据保存在数据框d中，变量名为y和x，用R的lm()函数计算回归</p>
+<pre class="r"><code>set.seed(1)
+nsamp &lt;- 30
+x &lt;- runif(nsamp, -10, 10)
+y &lt;- 20 + 0.5*x + rnorm(nsamp,0,0.5)
+d &lt;- data.frame(x=x, y=y)
+lm1 &lt;- lm(y ~ x, data=d); lm1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x, data = d)
+## 
+## Coefficients:
+## (Intercept)            x  
+##     20.0388       0.4988</code></pre>
+<p>结果只有回归系数。需要用summary()显示较详细的结果。如</p>
+<pre class="r"><code>summary(lm1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x, data = d)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.03030 -0.16436 -0.05741  0.29511  0.64046 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 20.03883    0.07226   277.3   &lt;2e-16 ***
+## x            0.49876    0.01244    40.1   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3956 on 28 degrees of freedom
+## Multiple R-squared:  0.9829, Adjusted R-squared:  0.9823 
+## F-statistic:  1608 on 1 and 28 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>对d.class数据集，建立体重对身高的回归方程:</p>
+<pre class="r"><code>d.class</code></pre>
+<pre><code>##       name sex age height weight
+## 1    Alice   F  13   56.5   84.0
+## 2    Becka   F  13   65.3   98.0
+## 3     Gail   F  14   64.3   90.0
+## 4    Karen   F  12   56.3   77.0
+## 5    Kathy   F  12   59.8   84.5
+## 6     Mary   F  15   66.5  112.0
+## 7    Sandy   F  11   51.3   50.5
+## 8   Sharon   F  15   62.5  112.5
+## 9    Tammy   F  14   62.8  102.5
+## 10  Alfred   M  14   69.0  112.5
+## 11    Duke   M  14   63.5  102.5
+## 12   Guido   M  15   67.0  133.0
+## 13   James   M  12   57.3   83.0
+## 14 Jeffrey   M  13   62.5   84.0
+## 15    John   M  12   59.0   99.5
+## 16  Philip   M  16   72.0  150.0
+## 17  Robert   M  12   64.8  128.0
+## 18  Thomas   M  11   57.5   85.0
+## 19 William   M  15   66.5  112.0</code></pre>
+<pre class="r"><code>lm2 &lt;- lm(weight ~ height, data=d.class)
+summary(lm2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = weight ~ height, data = d.class)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -17.6807  -6.0642   0.5115   9.2846  18.3698 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -143.0269    32.2746  -4.432 0.000366 ***
+## height         3.8990     0.5161   7.555 7.89e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.23 on 17 degrees of freedom
+## Multiple R-squared:  0.7705, Adjusted R-squared:  0.757 
+## F-statistic: 57.08 on 1 and 17 DF,  p-value: 7.887e-07</code></pre>
+</div>
+<div id="ols回归的诊断" class="section level2">
+<h2>OLS回归的诊断</h2>
+<p>参考<a href="https://zhuanlan.zhihu.com/p/341318994">R语言统计-回归篇：回归诊断</a></p>
+<p>经典线性模型假定</p>
+<ul>
+<li>MLR.1 线性于参数</li>
+<li>MLR.2 随机抽样</li>
+<li>MLR.3 不存在完全共线性</li>
+<li>MLR.4 条件均值为零</li>
+<li>MLR.5 同方差性</li>
+<li>MLR.6 正态性</li>
+</ul>
+<p>1~4 保证OLS估计无偏</p>
+<p>5 保证OLS估计是无偏估计中方差最小的</p>
+<p>6 保证t统计量和F统计量的假设检验</p>
+<!-- - __随机抽样__ -->
+<!-- - __线性__ 若因变量与自变量线性相关，那么残差值与预测（拟合）值就没有任何系统关联。 换句话说，除了白噪声，模型应该包含数据中所有的系统方差。在“残差图与拟合图” （Residuals vs Fitted，左上）中可以清楚地看到一个曲线关系，这暗示着你可能需要对回 归模型加上一个二次项。 -->
+<!-- - __独立性__ 你无法从这些图中分辨出因变量值是否相互独立，只能从收集的数据中来验证。 上面的例子中，没有任何先验的理由去相信一位女性的体重会影响另外一位女性的体重。 假若你发现数据是从一个家庭抽样得来的，那么可能必须要调整模型独立性的假设。 -->
+<!-- - __正态性__ 当预测变量值固定时，因变量成正态分布，则残差值（预测与真实的差值）也应该是一个均值为0的正态分布。“正态Q-Q图”（Normal Q-Q，右上）是在正态分布对应的值下，标准化残差的概图。若满足正态假设，那么图上的点应该落在呈45度角的直线上；若不是如此，那么 就违反了正态性的假设。 -->
+<!-- - __同方差性__ 若满足不变方差假设，那么在“位置尺度图”（Scale-Location Graph，左下） 中，水平线周围的点应该随机分布。该图似乎满足此假设。 最后一幅“残差与杠杆图”（Residuals vs Leverage，右下）提供了你可能关注的单个观测点的信息。从图形可以鉴别出离群点、高杠杆值点和强影响点。 -->
+<pre class="r"><code>plot(lm2)</code></pre>
+<p><img src="/post/2021-12-01-hwmis-r_files/figure-html/unnamed-chunk-7-1.png" width="672" /><img src="/post/2021-12-01-hwmis-r_files/figure-html/unnamed-chunk-7-2.png" width="672" /><img src="/post/2021-12-01-hwmis-r_files/figure-html/unnamed-chunk-7-3.png" width="672" /><img src="/post/2021-12-01-hwmis-r_files/figure-html/unnamed-chunk-7-4.png" width="672" /></p>
+<p>第一幅图是残差对预测值散点图， 散点应该随机在0线上下波动，不应该有曲线模式、分散程度增大模式、 特别突出的离群点等情况。</p>
+<p>第二幅图是残差的正态QQ图， 散点接近于直线时可以认为模型误差项的正态分布假定是合理的。</p>
+<p>第三幅图是误差大小(标准化残差绝对值的平方根)对拟合值的图形， 可以判断方差齐性假设(方差
+<code>$\sigma$</code>不变)。如果满足同方差性，那么图中水平线周围的点应该随机分布。</p>
+<p>第四个幅是残差对杠杆量图，并叠加了Cook距离等值线。 杠杆量代表了回归自变量对结果的影响大小， 超过<code>$4/n$</code>的值是需要重视的。 Cook距离考察删去第个观测对回归结果的影响， 如果有超出两条虚线范围之外的点， 就可能是强影响点。</p>
+<p>更多资料可以百度，以及其它的R包，比如car。</p>
+</div>
+<div id="r可视化" class="section level2">
+<h2>R可视化</h2>
+<p>变量相关性矩阵</p>
+<p>1986 年 322 名美国职业棒球大联盟的常规和替补击球手的数据。</p>
+<ul>
+<li><p>Atbat: Number of times at bat in 1986</p></li>
+<li><p>Hits: Number of hits in 1986</p></li>
+<li><p>Homer: Number of home runs in 1986</p></li>
+<li><p>Runs: Number of runs in 1986</p></li>
+<li><p>RBI: Runs batted in during 1986</p></li>
+<li><p>Walks: Number of walks in 1986</p></li>
+<li><p>Years: Number of years in the major leagues</p></li>
+<li><p>Atbatc: Number of times at bat in his career</p></li>
+<li><p>Putouts: Number of putouts in 1986</p></li>
+<li><p>Assists: Number of assists in 1986</p></li>
+<li><p>Errors: Number of errors in 1986</p></li>
+<li><p>logSal: Log of salary</p></li>
+</ul>
+<pre class="r"><code>library(corrgram)
+baseball</code></pre>
+<pre><code>##               Name League Team Position Atbat Hits Homer Runs RBI Walks Years
+## 1   Andy Allanson       A  CLE       C    293   66     1   30  29    14     1
+## 2   Alan Ashby          N  HOU       C    315   81     7   24  38    39    14
+## 3   Alvin Davis         A  SEA       1B   479  130    18   66  72    76     3
+## 4   Andre Dawson        N  MON       OF   496  141    20   65  78    37    11
+## 5   A Galarraga         N  MON       1B   321   87    10   39  42    30     2
+## 6   A Griffin           A  OAK       SS   594  169     4   74  51    35    11
+## 7   Al Newman           N  MON       2B   185   37     1   23   8    21     2
+## 8   A Salazar           A  KC        SS   298   73     0   24  24     7     3
+## 9   Andres Thomas       N  ATL       SS   323   81     6   26  32     8     2
+## 10  A Thornton          A  CLE       DH   401   92    17   49  66    65    13
+## 11  Alan Trammell       A  DET       SS   574  159    21  107  75    59    10
+## 12  Alex Trevino        N  LA        C    202   53     4   31  26    27     9
+## 13  A Van.Slyke         N  STL       OF   418  113    13   48  61    47     4
+## 14  Alan Wiggins        A  BAL       2B   239   60     0   30  11    22     6
+## 15  Bill Almon          N  PIT       UT   196   43     7   29  27    30    13
+## 16  Billy Beane         A  MIN       OF   183   39     3   20  15    11     3
+## 17  Buddy Bell          N  CIN       3B   568  158    20   89  75    73    15
+## 18  B Biancalana        A  KC        SS   190   46     2   24   8    15     5
+## 19  Bruce Bochte        A  OAK       1B   407  104     6   57  43    65    12
+## 20  Bruce Bochy         N  SD        C    127   32     8   16  22    14     8
+## 21  Barry Bonds         N  PIT       OF   413   92    16   72  48    65     1
+## 22  Bobby Bonilla       A  CHA       OF   426  109     3   55  43    62     1
+## 23  Bob Boone           A  CAL       C     22   10     1    4   2     1     6
+## 24  Bob Brenly          N  SF        C    472  116    16   60  62    74     6
+## 25  Bill Buckner        A  BOS       1B   629  168    18   73 102    40    18
+## 26  Brett Butler        A  CLE       OF   587  163     4   92  51    70     6
+## 27  Bob Dernier         N  CHN       OF   324   73     4   32  18    22     7
+## 28  Bo Diaz             N  CIN       C    474  129    10   50  56    40    10
+## 29  Bill Doran          N  HOU       2B   550  152     6   92  37    81     5
+## 30  Brian Downing       A  CAL       OF   513  137    20   90  95    90    14
+## 31  Bobby Grich         A  CAL       2B   313   84     9   42  30    39    17
+## 32  Billy Hatcher       N  HOU       OF   419  108     6   55  36    22     3
+## 33  Bob Horner          N  ATL       1B   517  141    27   70  87    52     9
+## 34  Brook Jacoby        A  CLE       3B   583  168    17   83  80    56     5
+## 35  Bob Kearney         A  SEA       C    204   49     6   23  25    12     7
+## 36  Bill Madlock        N  LA        3B   379  106    10   38  60    30    14
+## 37  Bobby Meacham       A  NYA       SS   161   36     0   19  10    17     4
+## 38  Bob Melvin          N  SF        C    268   60     5   24  25    15     2
+## 39  Ben Oglivie         A  MIL       DH   346   98     5   31  53    30    16
+## 40  Bip Roberts         N  SD        2B   241   61     1   34  12    14     1
+## 41  B Robidoux          A  MIL       1B   181   41     1   15  21    33     2
+## 42  Bill Russell        N  LA        UT   216   54     0   21  18    15    18
+## 43  Billy Sample        N  ATL       OF   200   57     6   23  14    14     9
+## 44  B Schroeder         A  MIL       UT   217   46     7   32  19     9     4
+## 45  Butch Wynegar       A  NYA       C    194   40     7   19  29    30    11
+## 46  Chris Bando         A  CLE       C    254   68     2   28  26    22     6
+## 47  Chris Brown         N  SF        3B   416  132     7   57  49    33     3
+## 48  C Castillo          A  CLE       OF   205   57     8   34  32     9     5
+## 49  Cecil Cooper        A  MIL       1B   542  140    12   46  75    41    16
+## 50  Chili Davis         N  SF        OF   526  146    13   71  70    84     6
+## 51  Carlton Fisk        A  CHA       C    457  101    14   42  63    22    17
+## 52  Curt Ford           N  STL       OF   214   53     2   30  29    23     2
+## 53  Cliff Johnson       A  TOR       DH    19    7     0    1   2     1     4
+## 54  C Lansford          A  OAK       3B   591  168    19   80  72    39     9
+## 55  Chet Lemon          A  DET       OF   403  101    12   45  53    39    12
+## 56  C Maldonado         N  SF        OF   405  102    18   49  85    20     6
+## 57  C Martinez          N  SD        OF   244   58     9   28  25    35     4
+## 58  Charlie Moore       A  MIL       C    235   61     3   24  39    21    14
+## 59  C Reynolds          N  HOU       SS   313   78     6   32  41    12    12
+## 60  Cal Ripken          A  BAL       SS   627  177    25   98  81    70     6
+## 61  Cory Snyder         A  CLE       OF   416  113    24   58  69    16     1
+## 62  Chris Speier        N  CHN       3B   155   44     6   21  23    15    16
+## 63  C Wilkerson         A  TEX       2B   236   56     0   27  15    11     4
+## 64  Dave Anderson       N  LA        3B   216   53     1   31  15    22     4
+## 65  Doug Baker          A  OAK       OF    24    3     0    1   0     2     3
+## 66  Don Baylor          A  BOS       DH   585  139    31   93  94    62    17
+## 67  D Bilardello        N  MON       C    191   37     4   12  17    14     4
+## 68  Daryl Boston        A  CHA       OF   199   53     5   29  22    21     3
+## 69  Darnell Coles       A  DET       3B   521  142    20   67  86    45     4
+## 70  Dave Collins        A  DET       OF   419  113     1   44  27    44    12
+## 71  D Concepcion        N  CIN       UT   311   81     3   42  30    26    17
+## 72  D Daulton           N  PHI       C    138   31     8   18  21    38     3
+## 73  Doug DeCinces       A  CAL       3B   512  131    26   69  96    52    14
+## 74  Darrell Evans       A  DET       1B   507  122    29   78  85    91    18
+## 75  Dwight Evans        A  BOS       OF   529  137    26   86  97    97    15
+## 76  Damaso Garcia       A  TOR       2B   424  119     6   57  46    13     9
+## 77  Dan Gladden         N  SF        OF   351   97     4   55  29    39     4
+## 78  Danny Heep          N  NYN       OF   195   55     5   24  33    30     8
+## 79  D Henderson         A  SEA       OF   388  103    15   59  47    39     6
+## 80  Donnie Hill         A  OAK       2B   339   96     4   37  29    23     4
+## 81  Dave Kingman        A  OAK       DH   561  118    35   70  94    33    16
+## 82  Davey Lopes         N  CHN       3B   255   70     7   49  35    43    15
+## 83  Don Mattingly       A  NYA       1B   677  238    31  117 113    53     5
+## 84  Darryl Motley       A  KC        OF   227   46     7   23  20    12     5
+## 85  Dale Murphy         N  ATL       OF   614  163    29   89  83    75    11
+## 86  Dwayne Murphy       A  OAK       OF   329   83     9   50  39    56     9
+## 87  Dave Parker         N  CIN       OF   637  174    31   89 116    56    14
+## 88  Dan Pasqua          A  NYA       OF   280   82    16   44  45    47     2
+## 89  D Porter            A  TEX       C    155   41    12   21  29    22    16
+## 90  D Schofield         A  CAL       SS   458  114    13   67  57    48     4
+## 91  Don Slaught         A  TEX       C    314   83    13   39  46    16     5
+## 92  D Strawberry        N  NYN       OF   475  123    27   76  93    72     4
+## 93  Dale Sveum          A  MIL       3B   317   78     7   35  35    32     1
+## 94  D Tartabull         A  SEA       OF   511  138    25   76  96    61     3
+## 95  Dickie Thon         N  HOU       SS   278   69     3   24  21    29     8
+## 96  Denny Walling       N  HOU       3B   382  119    13   54  58    36    12
+## 97  Dave Winfield       A  NYA       OF   565  148    24   90 104    77    14
+## 98  Enos Cabell         N  LA        1B   277   71     2   27  29    14    15
+## 99  Eric Davis          N  CIN       OF   415  115    27   97  71    68     3
+## 100 Eddie Milner        N  CIN       OF   424  110    15   70  47    36     7
+## 101 Eddie Murray        A  BAL       1B   495  151    17   61  84    78    10
+## 102 Ernest Riles        A  MIL       SS   524  132     9   69  47    54     2
+## 103 Ed Romero           A  BOS       SS   233   49     2   41  23    18     8
+## 104 Ernie Whitt         A  TOR       C    395  106    16   48  56    35    10
+## 105 Fred Lynn           A  BAL       OF   397  114    23   67  67    53    13
+## 106 Floyd Rayford       A  BAL       3B   210   37     8   15  19    15     6
+## 107 F Stubbs            N  LA        OF   420   95    23   55  58    37     3
+## 108 Frank White         A  KC        2B   566  154    22   76  84    43    14
+## 109 George Bell         A  TOR       OF   641  198    31  101 108    41     5
+## 110 Glenn Braggs        A  MIL       OF   215   51     4   19  18    11     1
+## 111 George Brett        A  KC        3B   441  128    16   70  73    80    14
+## 112 Greg Brock          N  LA        1B   325   76    16   33  52    37     5
+## 113 Gary Carter         N  NYN       C    490  125    24   81 105    62    13
+## 114 Glenn Davis         N  HOU       1B   574  152    31   91 101    64     3
+## 115 George Foster       N  NYN       OF   284   64    14   30  42    24    18
+## 116 Gary Gaetti         A  MIN       3B   596  171    34   91 108    52     6
+## 117 Greg Gagne          A  MIN       SS   472  118    12   63  54    30     4
+## 118 G Hendrick          A  CAL       OF   283   77    14   45  47    26    16
+## 119 Glenn Hubbard       N  ATL       2B   408   94     4   42  36    66     9
+## 120 Garth Iorg          A  TOR       3B   327   85     3   30  44    20     8
+## 121 Gary Matthews       N  CHN       OF   370   96    21   49  46    60    15
+## 122 Graig Nettles       N  SD        3B   354   77    16   36  55    41    20
+## 123 Gary Pettis         A  CAL       OF   539  139     5   93  58    69     5
+## 124 Gary Redus          N  PHI       OF   340   84    11   62  33    47     5
+## 125 G Templeton         N  SD        SS   510  126     2   42  44    35    11
+## 126 Gorman Thomas       A  SEA       DH   315   59    16   45  36    58    13
+## 127 Greg Walker         A  CHA       1B   282   78    13   37  51    29     5
+## 128 Gary Ward           A  TEX       OF   380  120     5   54  51    31     8
+## 129 Glenn Wilson        N  PHI       OF   584  158    15   70  84    42     5
+## 130 Harold Baines       A  CHA       OF   570  169    21   72  88    38     7
+## 131 Hubie Brooks        N  MON       SS   306  104    14   50  58    25     7
+## 132 H Johnson           N  NYN       3B   220   54    10   30  39    31     5
+## 133 Hal McRae           A  KC        DH   278   70     7   22  37    18    18
+## 134 H Reynolds          A  SEA       2B   445   99     1   46  24    29     4
+## 135 Harry Spilman       N  SF        1B   143   39     5   18  30    15     9
+## 136 H Winningham        N  MON       OF   185   40     4   23  11    18     3
+## 137 J Barfield          A  TOR       OF   589  170    40  107 108    69     6
+## 138 Juan Beniquez       A  BAL       UT   343  103     6   48  36    40    15
+## 139 Juan Bonilla        A  BAL       2B   284   69     1   33  18    25     5
+## 140 J Cangelosi         A  CHA       OF   438  103     2   65  32    71     2
+## 141 Jose Canseco        A  OAK       OF   600  144    33   85 117    65     2
+## 142 Joe Carter          A  CLE       OF   663  200    29  108 121    32     4
+## 143 Jack Clark          N  STL       1B   232   55     9   34  23    45    12
+## 144 Jose Cruz           N  HOU       OF   479  133    10   48  72    55    17
+## 145 Julio Cruz          A  CHA       2B   209   45     0   38  19    42    10
+## 146 Jody Davis          N  CHN       C    528  132    21   61  74    41     6
+## 147 Jim Dwyer           A  BAL       DH   160   39     8   18  31    22    14
+## 148 Julio Franco        A  CLE       SS   599  183    10   80  74    32     5
+## 149 Jim Gantner         A  MIL       2B   497  136     7   58  38    26    11
+## 150 Johnny Grubb        A  DET       DH   210   70    13   32  51    28    15
+## 151 J Hairston          A  CHA       UT   225   61     5   32  26    26    11
+## 152 Jack Howell         A  CAL       3B   151   41     4   26  21    19     2
+## 153 John Kruk           N  SD        OF   278   86     4   33  38    45     1
+## 154 J Leonard           N  SF        OF   341   95     6   48  42    20    10
+## 155 Jim Morrison        N  PIT       3B   537  147    23   58  88    47    10
+## 156 John Moses          A  SEA       OF   399  102     3   56  34    34     5
+## 157 J Mumphrey          N  CHN       OF   309   94     5   37  32    26    13
+## 158 Joe Orsulak         N  PIT       OF   401  100     2   60  19    28     4
+## 159 Jorge Orta          A  KC        DH   336   93     9   35  46    23    15
+## 160 Jim Presley         A  SEA       3B   616  163    27   83 107    32     3
+## 161 Jamie Quirk         A  KC        C    219   47     8   24  26    17    12
+## 162 Johnny Ray          N  PIT       2B   579  174     7   67  78    58     6
+## 163 Jeff Reed           A  MIN       C    165   39     2   13   9    16     3
+## 164 Jim Rice            A  BOS       OF   618  200    20   98 110    62    13
+## 165 Jerry Royster       N  SD        UT   257   66     5   31  26    32    14
+## 166 John Russell        N  PHI       C    315   76    13   35  60    25     3
+## 167 Juan Samuel         N  PHI       2B   591  157    16   90  78    26     4
+## 168 John Shelby         A  BAL       OF   404   92    11   54  49    18     6
+## 169 Joel Skinner        A  CHA       C    315   73     5   23  37    16     4
+## 170 Jeff Stone          N  PHI       OF   249   69     6   32  19    20     4
+## 171 Jim Sundberg        A  KC        C    429   91    12   41  42    57    13
+## 172 Jim Traber          A  BAL       UT   212   54    13   28  44    18     2
+## 173 Jose Uribe          N  SF        SS   453  101     3   46  43    61     3
+## 174 Jerry Willard       A  OAK       C    161   43     4   17  26    22     3
+## 175 J Youngblood        N  SF        OF   184   47     5   20  28    18    11
+## 176 Kevin Bass          N  HOU       OF   591  184    20   83  79    38     5
+## 177 Kal Daniels         N  CIN       OF   181   58     6   34  23    22     1
+## 178 Kirk Gibson         A  DET       OF   441  118    28   84  86    68     8
+## 179 Ken Griffey         A  NYA       OF   490  150    21   69  58    35    14
+## 180 K Hernandez         N  NYN       1B   551  171    13   94  83    94    13
+## 181 Kent Hrbek          A  MIN       1B   550  147    29   85  91    71     6
+## 182 Ken Landreaux       N  LA        OF   283   74     4   34  29    22    10
+## 183 K McReynolds        N  SD        OF   560  161    26   89  96    66     4
+## 184 K Mitchell          N  NYN       OF   328   91    12   51  43    33     2
+## 185 K Moreland          N  CHN       OF   586  159    12   72  79    53     9
+## 186 Ken Oberkfell       N  ATL       3B   503  136     5   62  48    83    10
+## 187 Ken Phelps          A  SEA       DH   344   85    24   69  64    88     7
+## 188 Kirby Puckett       A  MIN       OF   680  223    31  119  96    34     3
+## 189 K Stillwell         N  CIN       SS   279   64     0   31  26    30     1
+## 190 Leon Durham         N  CHN       1B   484  127    20   66  65    67     7
+## 191 Len Dykstra         N  NYN       OF   431  127     8   77  45    58     2
+## 192 Larry Herndon       A  DET       OF   283   70     8   33  37    27    12
+## 193 Lee Lacy            A  BAL       OF   491  141    11   77  47    37    15
+## 194 Len Matuszek        N  LA        OF   199   52     9   26  28    21     6
+## 195 Lloyd Moseby        A  TOR       OF   589  149    21   89  86    64     7
+## 196 Lance Parrish       A  DET       C    327   84    22   53  62    38    10
+## 197 Larry Parrish       A  TEX       DH   464  128    28   67  94    52    13
+## 198 Luis Rivera         N  MON       SS   166   34     0   20  13    17     1
+## 199 Larry Sheets        A  BAL       DH   338   92    18   42  60    21     3
+## 200 Lonnie Smith        A  KC        OF   508  146     8   80  44    46     9
+## 201 Lou Whitaker        A  DET       2B   584  157    20   95  73    63    10
+## 202 Mike Aldrete        N  SF        1B   216   54     2   27  25    33     1
+## 203 Marty Barrett       A  BOS       2B   625  179     4   94  60    65     5
+## 204 Mike Brown          N  PIT       OF   243   53     4   18  26    27     4
+## 205 Mike Davis          A  OAK       OF   489  131    19   77  55    34     7
+## 206 Mike Diaz           N  PIT       OF   209   56    12   22  36    19     2
+## 207 M Duncan            N  LA        SS   407   93     8   47  30    30     2
+## 208 Mike Easler         A  NYA       DH   490  148    14   64  78    49    13
+## 209 M Fitzgerald        N  MON       C    209   59     6   20  37    27     4
+## 210 Mel Hall            A  CLE       OF   442  131    18   68  77    33     6
+## 211 M Hatcher           A  MIN       UT   317   88     3   40  32    19     8
+## 212 Mike Heath          N  STL       C    288   65     8   30  36    27     9
+## 213 Mike Kingery        A  KC        OF   209   54     3   25  14    12     1
+## 214 M LaValliere        N  STL       C    303   71     3   18  30    36     3
+## 215 Mike Marshall       N  LA        OF   330   77    19   47  53    27     6
+## 216 M Pagliarulo        A  NYA       3B   504  120    28   71  71    54     3
+## 217 Mark Salas          A  MIN       C    258   60     8   28  33    18     3
+## 218 Mike Schmidt        N  PHI       3B    20    1     0    0   0     0     2
+## 219 Mike Scioscia       N  LA        C    374   94     5   36  26    62     7
+## 220 M Tettleton         A  OAK       C    211   43    10   26  35    39     3
+## 221 Milt Thompson       N  PHI       OF   299   75     6   38  23    26     3
+## 222 Mitch Webster       N  MON       OF   576  167     8   89  49    57     4
+## 223 Mookie Wilson       N  NYN       OF   381  110     9   61  45    32     7
+## 224 Marvell Wynne       N  SD        OF   288   76     7   34  37    15     4
+## 225 Mike Young          A  BAL       OF   369   93     9   43  42    49     5
+## 226 Nick Esasky         N  CIN       1B   330   76    12   35  41    47     4
+## 227 Ozzie Guillen       A  CHA       SS   547  137     2   58  47    12     2
+## 228 O McDowell          A  TEX       OF   572  152    18  105  49    65     2
+## 229 Omar Moreno         N  ATL       OF   359   84     4   46  27    21    12
+## 230 Ozzie Smith         N  STL       SS   514  144     0   67  54    79     9
+## 231 Ozzie Virgil        N  ATL       C    359   80    15   45  48    63     7
+## 232 Phil Bradley        A  SEA       OF   526  163    12   88  50    77     4
+## 233 Phil Garner         N  HOU       3B   313   83     9   43  41    30    14
+## 234 P Incaviglia        A  TEX       OF   540  135    30   82  88    55     1
+## 235 Paul Molitor        A  MIL       3B   437  123     9   62  55    40     9
+## 236 Pete O&#39;Brien        A  TEX       1B   551  160    23   86  90    87     5
+## 237 Pete Rose           N  CIN       1B   237   52     0   15  25    30    24
+## 238 Pat Sheridan        A  DET       OF   236   56     6   41  19    21     5
+## 239 Pat Tabler          A  CLE       1B   473  154     6   61  48    29     6
+## 240 R Belliard          N  PIT       SS   309   72     0   33  31    26     5
+## 241 Rick Burleson       A  CAL       UT   271   77     5   35  29    33    12
+## 242 Randy Bush          A  MIN       OF   357   96     7   50  45    39     5
+## 243 Rick Cerone         A  MIL       C    216   56     4   22  18    15    12
+## 244 Ron Cey             N  CHN       3B   256   70    13   42  36    44    16
+## 245 Rob Deer            A  MIL       OF   466  108    33   75  86    72     3
+## 246 Rick Dempsey        A  BAL       C    327   68    13   42  29    45    18
+## 247 Rich Gedman         A  BOS       C    462  119    16   49  65    37     7
+## 248 Ron Hassey          A  NYA       C    341  110     9   45  49    46     9
+## 249 R Henderson         A  NYA       OF   608  160    28  130  74    89     8
+## 250 R Jackson           A  CAL       DH   419  101    18   65  58    92    20
+## 251 Ricky Jones         A  CAL       OF    33    6     0    2   4     7     1
+## 252 Ron Kittle          A  CHA       DH   376   82    21   42  60    35     5
+## 253 Ray Knight          N  NYN       3B   486  145    11   51  76    40    11
+## 254 Randy Kutcher       N  SF        OF   186   44     7   28  16    11     1
+## 255 Rudy Law            A  KC        OF   307   80     1   42  36    29     7
+## 256 Rick Leach          A  TOR       DH   246   76     5   35  39    13     6
+## 257 Rick Manning        A  MIL       OF   205   52     8   31  27    17    12
+## 258 R Mulliniks         A  TOR       3B   348   90    11   50  45    43    10
+## 259 Ron Oester          N  CIN       2B   523  135     8   52  44    52     9
+## 260 Rey Quinones        A  BOS       SS   312   68     2   32  22    24     1
+## 261 R Ramirez           N  ATL       SS   496  119     8   57  33    21     7
+## 262 Ronn Reynolds       N  PIT       OF   126   27     3    8  10     5     4
+## 263 Ron Roenicke        N  PHI       OF   275   68     5   42  42    61     6
+## 264 Ryne Sandberg       N  CHN       2B   627  178    14   68  76    46     6
+## 265 R Santana           N  NYN       SS   394   86     1   38  28    36     4
+## 266 Rick Schu           N  PHI       3B   208   57     8   32  25    18     3
+## 267 Ruben Sierra        A  TEX       OF   382  101    16   50  55    22     1
+## 268 Roy Smalley         A  MIN       DH   459  113    20   59  57    68    12
+## 269 R Thompson          N  SF        2B   549  149     7   73  47    42     1
+## 270 Rob Wilfong         A  CAL       2B   288   63     3   25  33    16    10
+## 271 R Williams          N  LA        OF   303   84     4   35  32    23     2
+## 272 Robin Yount         A  MIL       OF   522  163     9   82  46    62    13
+## 273 Steve Balboni       A  KC        1B   512  117    29   54  88    43     6
+## 274 Scott Bradley       A  SEA       C    220   66     5   20  28    13     3
+## 275 Sid Bream           N  PIT       1B   522  140    16   73  77    60     4
+## 276 S Buechele          A  TEX       3B   461  112    18   54  54    35     2
+## 277 S Dunston           N  CHN       SS   581  145    17   66  68    21     2
+## 278 S Fletcher          A  TEX       SS   530  159     3   82  50    47     6
+## 279 Steve Garvey        N  SD        1B   557  142    21   58  81    23    18
+## 280 Steve Jeltz         N  PHI       SS   439   96     0   44  36    65     4
+## 281 S Lombardozzi       A  MIN       2B   453  103     8   53  33    52     2
+## 282 Spike Owen          A  SEA       SS   528  122     1   67  45    51     4
+## 283 Steve Sax           N  LA        2B   633  210     6   91  56    59     6
+## 284 Tony Armas          A  BOS       OF    16    2     0    1   0     0     2
+## 285 T Bernazard         A  CLE       2B   562  169    17   88  73    53     8
+## 286 Tom Brookens        A  DET       UT   281   76     3   42  25    20     8
+## 287 Tom Brunansky       A  MIN       OF   593  152    23   69  75    53     6
+## 288 T Fernandez         A  TOR       SS   687  213    10   91  65    27     4
+## 289 Tim Flannery        N  SD        2B   368  103     3   48  28    54     8
+## 290 Tom Foley           N  MON       UT   263   70     1   26  23    30     4
+## 291 Tony Gwynn          N  SD        OF   642  211    14  107  59    52     5
+## 292 Terry Harper        N  ATL       OF   265   68     8   26  30    29     7
+## 293 Toby Harrah         A  TEX       2B   289   63     7   36  41    44    17
+## 294 Tommy Herr          N  STL       2B   559  141     2   48  61    73     8
+## 295 Tim Hulett          A  CHA       3B   520  120    17   53  44    21     4
+## 296 Terry Kennedy       N  SD        C     19    4     1    2   3     1     1
+## 297 Tito Landrum        N  STL       OF   205   43     2   24  17    20     7
+## 298 Tim Laudner         A  MIN       C    193   47    10   21  29    24     6
+## 299 Tom O&#39;Malley        A  BAL       3B   181   46     1   19  18    17     5
+## 300 Tom Paciorek        A  TEX       UT   213   61     4   17  22     3    17
+## 301 Tony Pena           N  PIT       C    510  147    10   56  52    53     7
+## 302 T Pendleton         N  STL       3B   578  138     1   56  59    34     3
+## 303 Tony Perez          N  CIN       1B   200   51     2   14  29    25    23
+## 304 Tony Phillips       A  OAK       2B   441  113     5   76  52    76     5
+## 305 Terry Puhl          N  HOU       OF   172   42     3   17  14    15    10
+## 306 Tim Raines          N  MON       OF   580  194     9   91  62    78     8
+## 307 Ted Simmons         N  ATL       UT   127   32     4   14  25    12    19
+## 308 Tim Teufel          N  NYN       2B   279   69     4   35  31    32     4
+## 309 Tim Wallach         N  MON       3B   480  112    18   50  71    44     7
+## 310 Vince Coleman       N  STL       OF   600  139     0   94  29    60     2
+## 311 Von Hayes           N  PHI       1B   610  186    19  107  98    74     6
+## 312 Vance Law           N  MON       2B   360   81     5   37  44    37     7
+## 313 Wally Backman       N  NYN       2B   387  124     1   67  27    36     7
+## 314 Wade Boggs          A  BOS       3B   580  207     8  107  71   105     5
+## 315 Will Clark          N  SF        1B   408  117    11   66  41    34     1
+## 316 Wally Joyner        A  CAL       1B   593  172    22   82 100    57     1
+## 317 W Krenchicki        N  MON       1B   221   53     2   21  23    22     8
+## 318 Willie McGee        N  STL       OF   497  127     7   65  48    37     5
+## 319 W Randolph          A  NYA       2B   492  136     5   76  50    94    12
+## 320 W Tolleson          A  CHA       3B   475  126     3   61  43    52     6
+## 321 Willie Upshaw       A  TOR       1B   573  144     9   85  60    78     8
+## 322 Willie Wilson       A  KC        OF   631  170     9   77  44    31    11
+##     Atbatc Hitsc Homerc Runsc RBIc Walksc Putouts Assists Errors Salary
+## 1      293    66      1    30   29     14     446      33     20     NA
+## 2     3449   835     69   321  414    375     632      43     10    475
+## 3     1624   457     63   224  266    263     880      82     14    480
+## 4     5628  1575    225   828  838    354     200      11      3    500
+## 5      396   101     12    48   46     33     805      40      4     92
+## 6     4408  1133     19   501  336    194     282     421     25    750
+## 7      214    42      1    30    9     24      76     127      7     70
+## 8      509   108      0    41   37     12     121     283      9    100
+## 9      341    86      6    32   34      8     143     290     19     75
+## 10    5206  1332    253   784  890    866       0       0      0   1100
+## 11    4631  1300     90   702  504    488     238     445     22    517
+## 12    1876   467     15   192  186    161     304      45     11    513
+## 13    1512   392     41   205  204    203     211      11      7    550
+## 14    1941   510      4   309  103    207     121     151      6    700
+## 15    3231   825     36   376  290    238      80      45      8    240
+## 16     201    42      3    20   16     11     118       0      0     NA
+## 17    8068  2273    177  1045  993    732     105     290     10    775
+## 18     479   102      5    65   23     39     102     177     16    175
+## 19    5233  1478    100   643  658    653     912      88      9     NA
+## 20     727   180     24    67   82     56     202      22      2    135
+## 21     413    92     16    72   48     65     280       9      5    100
+## 22     426   109      3    55   43     62     361      22      2    115
+## 23      84    26      2     9    9      3     812      84     11     NA
+## 24    1924   489     67   242  251    240     518      55      3    600
+## 25    8424  2464    164  1008 1072    402    1067     157     14    777
+## 26    2695   747     17   442  198    317     434       9      3    765
+## 27    1931   491     13   291  108    180     222       3      3    708
+## 28    2331   604     61   246  327    166     732      83     13    750
+## 29    2308   633     32   349  182    308     262     329     16    625
+## 30    5201  1382    166   763  734    784     267       5      3    900
+## 31    6890  1833    224  1033  864   1087     127     221      7     NA
+## 32     591   149      8    80   46     31     226       7      4    110
+## 33    3571   994    215   545  652    337    1378     102      8     NA
+## 34    1646   452     44   219  208    136     109     292     25    613
+## 35    1309   308     27   126  132     66     419      46      5    300
+## 36    6207  1906    146   859  803    571      72     170     24    850
+## 37    1053   244      3   156   86    107      70     149     12     NA
+## 38     350    78      5    34   29     18     442      59      6     90
+## 39    5913  1615    235   784  901    560       0       0      0     NA
+## 40     241    61      1    34   12     14     166     172     10     NA
+## 41     232    50      4    20   29     45     326      29      5     68
+## 42    7318  1926     46   796  627    483     103      84      5     NA
+## 43    2516   684     46   371  230    195      69       1      1     NA
+## 44     694   160     32    86   76     32     307      25      1    180
+## 45    4183  1069     64   486  493    608     325      22      2     NA
+## 46     999   236     21   108  117    118     359      30      4    305
+## 47     932   273     24   113  121     80      73     177     18    215
+## 48     756   192     32   117  107     51      58       4      4    248
+## 49    7099  2130    235   987 1089    431     697      61      9     NA
+## 50    2648   715     77   352  342    289     303       9      9    815
+## 51    6521  1767    281  1003  977    619     389      39      4    875
+## 52     226    59      2    32   32     27     109       7      3     70
+## 53      41    13      1     3    4      4       0       0      0     NA
+## 54    4478  1307    113   634  563    319      67     147      4   1200
+## 55    5150  1429    166   747  666    526     316       6      5    675
+## 56     950   231     29    99  138     64     161      10      3    415
+## 57    1335   333     49   164  179    194     142      14      2    340
+## 58    3926  1029     35   441  401    333     425      43      4     NA
+## 59    3742   968     35   409  321    170     106     206      7    417
+## 60    3210   927    133   529  472    313     240     482     13   1350
+## 61     416   113     24    58   69     16     203      70     10     90
+## 62    6631  1634     98   698  661    777      53      88      3    275
+## 63    1115   270      1   116   64     57     125     199     13    230
+## 64     926   210      9   118   69    114      73     152     11    225
+## 65     159    28      0    20   12      9      80       4      0     NA
+## 66    7546  1982    315  1141 1179    727       0       0      0    950
+## 67     773   163     16    61   74     52     391      38      8     NA
+## 68     514   120      8    57   40     39     152       3      5     75
+## 69     815   205     22    99  103     78     107     242     23    105
+## 70    4484  1231     32   612  344    422     211       2      1     NA
+## 71    8247  2198    100   950  909    690     153     223     10    320
+## 72     244    53     12    33   32     55     244      21      4     NA
+## 73    5347  1397    221   712  815    548     119     216     12    850
+## 74    7761  1947    347  1175 1152   1380     808     108      2    535
+## 75    6661  1785    291  1082  949    989     280      10      5    933
+## 76    3651  1046     32   461  301    112     224     286      8    850
+## 77    1258   353     16   196  110    117     226       7      3    210
+## 78    1313   338     25   144  149    153      83       2      1     NA
+## 79    2174   555     80   285  274    186     182       9      4    325
+## 80    1064   290     11   123  108     55     104     213      9    275
+## 81    6677  1575    442   901 1210    608     463      32      8     NA
+## 82    6311  1661    154  1019  608    820      51      54      8    450
+## 83    2223   737     93   349  401    171    1377     100      6   1975
+## 84    1325   324     44   156  158     67      92       2      2     NA
+## 85    5017  1388    266   813  822    617     303       6      6   1900
+## 86    3828   948    145   575  528    635     276       6      2    600
+## 87    6727  2024    247   978 1093    495     278       9      9   1042
+## 88     428   113     25    61   70     63     148       4      2    110
+## 89    5409  1338    181   746  805    875     165       9      1    260
+## 90    1350   298     28   160  123    122     246     389     18    475
+## 91    1457   405     28   156  159     76     533      40      4    432
+## 92    1810   471    108   292  343    267     226      10      6   1220
+## 93     317    78      7    35   35     32      45     122     26     70
+## 94     592   164     28    87  110     71     157       7      8    145
+## 95    2079   565     32   258  192    162     142     210     10     NA
+## 96    2133   594     41   287  294    227      59     156      9    595
+## 97    7287  2083    305  1135 1234    791     292       9      5   1861
+## 98    5952  1647     60   753  596    259     360      32      5     NA
+## 99     711   184     45   156  119     99     274       2      7    300
+## 100   2130   544     38   335  174    258     292       6      3    490
+## 101   5624  1679    275   884 1015    709    1045      88     13   2460
+## 102    972   260     14   123   92     90     212     327     20     NA
+## 103   1350   336      7   166  122    106     102     132     10    375
+## 104   2303   571     86   266  323    248     709      41      7     NA
+## 105   5589  1632    241   906  926    716     244       2      4     NA
+## 106    994   244     36   107  114     53      40     115     15     NA
+## 107    646   139     31    77   77     61     206      10      7     NA
+## 108   6100  1583    131   743  693    300     316     439     10    750
+## 109   2129   610     92   297  319    117     269      17     10   1175
+## 110    215    51      4    19   18     11     116       5     12     70
+## 111   6675  2095    209  1072 1050    695      97     218     16   1500
+## 112   1506   351     71   195  219    214     726      87      3    385
+## 113   6063  1646    271   847  999    680     869      62      8   1926
+## 114    985   260     53   148  173     95    1253     111     11    215
+## 115   7023  1925    348   986 1239    666      96       4      4     NA
+## 116   2862   728    107   361  401    224     118     334     21    900
+## 117    793   187     14   102   80     50     228     377     26    155
+## 118   6840  1910    259   915 1067    546     144       6      5    700
+## 119   3573   866     59   429  365    410     282     487     19    535
+## 120   2140   568     16   216  208     93      91     185     12    363
+## 121   6986  1972    231  1070  955    921     137       5      9    733
+## 122   8716  2172    384  1172 1267   1057      83     174     16    200
+## 123   1469   369     12   247  126    198     462       9      7    400
+## 124   1516   376     42   284  141    219     185       8      4    400
+## 125   5562  1578     44   703  519    256     207     358     20    738
+## 126   4677  1051    268   681  782    697       0       0      0     NA
+## 127   1649   453     73   211  280    138     670      57      5    500
+## 128   3118   900     92   444  419    240     237       8      1    600
+## 129   2358   636     58   265  316    134     331      20      4    663
+## 130   3754  1077    140   492  589    263     295      15      5    950
+## 131   2954   822     55   313  377    187     116     222     15    750
+## 132   1185   299     40   145  154    128      50     136     20    298
+## 133   7186  2081    190   935 1088    643       0       0      0    325
+## 134    618   129      1    72   31     48     278     415     16     88
+## 135    639   151     16    80   97     61     138      15      1    175
+## 136    524   125      7    58   37     47      97       2      2     90
+## 137   2325   634    128   371  376    238     368      20      3   1238
+## 138   4338  1193     70   581  421    325     211      56     13    430
+## 139   1407   361      6   139   98    111     122     140      5     NA
+## 140    440   103      2    67   32     71     276       7      9    100
+## 141    696   173     38   101  130     69     319       4     14    165
+## 142   1447   404     57   210  222     68     241       8      6    250
+## 143   4405  1213    194   702  705    625     623      35      3   1300
+## 144   7472  2147    153   980 1032    854     237       5      4    773
+## 145   3859   916     23   557  279    478     132     205      5     NA
+## 146   2641   671     97   273  383    226     885     105      8   1008
+## 147   2128   543     56   304  268    298      33       3      0    275
+## 148   2482   715     27   330  326    158     231     374     18    775
+## 149   3871  1066     40   450  367    241     304     347     10    850
+## 150   4040  1130     97   544  462    551       0       0      0    365
+## 151   1568   408     25   202  185    257     132       9      0     NA
+## 152    288    68      9    45   39     35      28      56      2     95
+## 153    278    86      4    33   38     45     102       4      2    110
+## 154   2964   808     81   379  428    221     158       4      5    100
+## 155   2744   730     97   302  351    174      92     257     20    278
+## 156    670   167      4    89   48     54     211       9      3     80
+## 157   4618  1330     57   616  522    436     161       3      3    600
+## 158    876   238      2   126   44     55     193      11      4     NA
+## 159   5779  1610    128   730  741    497       0       0      0     NA
+## 160   1437   377     65   181  227     82     110     308     15    200
+## 161   1188   286     23   100  125     63     260      58      4     NA
+## 162   3053   880     32   366  337    218     280     479      5    657
+## 163    196    44      2    18   10     18     332      19      2     75
+## 164   7127  2163    351  1104 1289    564     330      16      8   2413
+## 165   3910   979     33   518  324    382      87     166     14    250
+## 166    630   151     24    68   94     55     498      39     13    155
+## 167   2020   541     52   310  226     91     290     440     25    640
+## 168   1354   325     30   188  135     63     222       5      5    300
+## 169    450   108      6    38   46     28     227      15      3    110
+## 170    702   209     10    97   48     44     103       8      2     NA
+## 171   5590  1397     83   578  579    644     686      46      4    825
+## 172    233    59     13    31   46     20     243      23      5     NA
+## 173    948   218      6    96   72     91     249     444     16    195
+## 174    707   179     21    77   99     76     300      12      2     NA
+## 175   3327   890     74   419  382    304      49       2      0    450
+## 176   1689   462     40   219  195     82     303      12      5    630
+## 177    181    58      6    34   23     22      88       0      3     87
+## 178   2723   750    126   433  420    309     190       2      2   1300
+## 179   6126  1839    121   983  707    600      96       5      3   1000
+## 180   6090  1840    128   969  900    917    1199     149      5   1800
+## 181   2816   815    117   405  474    319    1218     104     10   1310
+## 182   3919  1062     85   505  456    283     145       5      7    738
+## 183   1789   470     65   233  260    155     332       9      8    625
+## 184    342    94     12    51   44     33     145      59      8    125
+## 185   3082   880     83   363  477    295     181      13      4   1043
+## 186   3423   970     20   408  303    414      65     258      8    725
+## 187    911   214     64   150  156    187       0       0      0    300
+## 188   1928   587     35   262  201     91     429       8      6    365
+## 189    279    64      0    31   26     30     107     205     16     75
+## 190   3006   844    116   436  458    377    1231      80      7   1183
+## 191    667   187      9   117   64     88     283       8      3    203
+## 192   4479  1222     94   557  483    307     156       2      2    225
+## 193   4291  1240     84   615  430    340     239       8      2    525
+## 194    805   191     30   113  119     87     235      22      5    265
+## 195   3558   928    102   513  471    351     371       6      6    788
+## 196   4273  1123    212   577  700    334     483      48      6    800
+## 197   5829  1552    210   740  840    452       0       0      0    588
+## 198    166    34      0    20   13     17      64     119      9     NA
+## 199    682   185     36    88  112     50       0       0      0    145
+## 200   3148   915     41   571  289    326     245       5      9     NA
+## 201   4704  1320     93   724  522    576     276     421     11    420
+## 202    216    54      2    27   25     33     317      36      1     75
+## 203   1696   476     12   216  163    166     303     450     14    575
+## 204    853   228     23   101  110     76     107       3      3     NA
+## 205   2051   549     62   300  263    153     310       9      9    780
+## 206    216    58     12    24   37     19     201       6      3     90
+## 207    969   230     14   121   69     68     172     317     25    150
+## 208   3400  1000    113   445  491    301       0       0      0    700
+## 209    884   209     14    66  106     92     415      35      3     NA
+## 210   1416   398     47   210  203    136     233       7      7    550
+## 211   2543   715     28   269  270    118     220      16      4     NA
+## 212   2815   698     55   315  325    189     259      30     10    650
+## 213    209    54      3    25   14     12     102       6      3     68
+## 214    344    76      3    20   36     45     468      47      6    100
+## 215   1928   516     90   247  288    161     149       8      6    670
+## 216   1085   259     54   150  167    114     103     283     19    175
+## 217    638   170     17    80   75     36     358      32      8    137
+## 218     41     9      2     6    7      4      78     220      6   2127
+## 219   1968   519     26   181  199    288     756      64     15    875
+## 220    498   116     14    59   55     78     463      32      8    120
+## 221    580   160      8    71   33     44     212       1      2    140
+## 222    822   232     19   132   83     79     325      12      8    210
+## 223   3015   834     40   451  249    168     228       7      5    800
+## 224   1644   408     16   198  120    113     203       3      3    240
+## 225   1258   323     54   181  177    157     149       1      6    350
+## 226   1367   326     55   167  198    167     512      30      5     NA
+## 227   1038   271      3   129   80     24     261     459     22    175
+## 228    978   249     36   168   91    101     325      13      3    200
+## 229   4992  1257     37   699  386    387     151       8      5     NA
+## 230   4739  1169     13   583  374    528     229     453     15   1940
+## 231   1493   359     61   176  202    175     682      93     13    700
+## 232   1556   470     38   245  167    174     250      11      1    750
+## 233   5885  1543    104   751  714    535      58     141     23    450
+## 234    540   135     30    82   88     55     157       6     14    172
+## 235   4139  1203     79   676  390    364      82     170     15   1260
+## 236   2235   602     75   278  328    273    1224     115     11     NA
+## 237  14053  4256    160  2165 1314   1566     523      43      6    750
+## 238   1257   329     24   166  125    105     172       1      4    190
+## 239   1966   566     29   250  252    178     846      84      9    580
+## 240    354    82      0    41   32     26     117     269     12    130
+## 241   4933  1358     48   630  435    403      62      90      3    450
+## 242   1394   344     43   178  192    136     167       2      4    300
+## 243   2796   665     43   266  304    198     391      44      4    250
+## 244   7058  1845    312   965 1128    990      41     118      8   1050
+## 245    652   142     44   102  109    102     286       8      8    215
+## 246   3949   939     78   438  380    466     659      53      7    400
+## 247   2131   583     69   244  288    150     866      65      6     NA
+## 248   2331   658     50   249  322    274     251       9      4    560
+## 249   4071  1182    103   862  417    708     426       4      6   1670
+## 250   9528  2510    548  1509 1659   1342       0       0      0    488
+## 251     33     6      0     2    4      7     205       5      4     NA
+## 252   1770   408    115   238  299    157       0       0      0    425
+## 253   3967  1102     67   410  497    284      88     204     16    500
+## 254    186    44      7    28   16     11      99       3      1     NA
+## 255   2421   656     18   379  198    184     145       2      2     NA
+## 256    912   234     12   102   96     80      44       0      1    250
+## 257   5134  1323     56   643  445    459     155       3      2    400
+## 258   2288   614     43   295  273    269      60     176      6    450
+## 259   3368   895     39   377  284    296     367     475     19    750
+## 260    312    68      2    32   22     24      86     150     15     70
+## 261   3358   882     36   365  280    165     155     371     29    875
+## 262    239    49      3    16   13     14     190       2      9    190
+## 263    961   238     16   128  104    172     181       3      2    191
+## 264   3146   902     74   494  345    242     309     492      5    740
+## 265   1089   267      3    94   71     76     203     369     16    250
+## 266    653   170     17    98   54     62      42      94     13    140
+## 267    382   101     16    50   55     22     200       7      6     98
+## 268   5348  1369    155   713  660    735       0       0      0    740
+## 269    549   149      7    73   47     42     255     450     17    140
+## 270   2682   667     38   315  259    204     135     257      7    342
+## 271    312    87      4    39   32     23     179       5      3     NA
+## 272   7037  2019    153  1043  827    535     352       9      1   1000
+## 273   1750   412    100   204  276    155    1236      98     18    100
+## 274    290    80      5    27   31     15     281      21      3     90
+## 275    730   185     22    93  106     86    1320     166     17    200
+## 276    680   160     24    76   75     49     111     226     11    135
+## 277    831   210     21   106   86     40     320     465     32    155
+## 278   1619   426     11   218  149    163     196     354     15    475
+## 279   8759  2583    271  1138 1299    478    1160      53      7   1450
+## 280    711   148      1    68   56     99     229     406     22    150
+## 281    507   123      8    63   39     58     289     407      6    105
+## 282   1716   403     12   211  146    155     209     372     17    350
+## 283   3070   872     19   420  230    274     367     432     16     90
+## 284     28     4      0     1    0      0     247       4      8     NA
+## 285   3181   841     61   450  342    373     351     442     17    530
+## 286   2658   657     48   324  300    179     106     144      7    342
+## 287   2765   686    133   369  384    321     315      10      6    940
+## 288   1518   448     15   196  137     89     294     445     13    350
+## 289   1897   493      9   207  162    198     209     246      3    327
+## 290    888   220      9    83   82     86      81     147      4    250
+## 291   2364   770     27   352  230    193     337      19      4    740
+## 292   1337   339     32   135  163    128      92       5      3    425
+## 293   7402  1954    195  1115  919   1153     166     211      7     NA
+## 294   3162   874     16   421  349    359     352     414      9    925
+## 295    927   227     22   106   80     52      70     144     11    185
+## 296     19     4      1     2    3      1     692      70      8    920
+## 297    854   219     12   105   99     71     131       6      1    287
+## 298   1136   256     42   129  139    106     299      13      5    245
+## 299    937   238      9    88   95    104      37      98      9     NA
+## 300   4061  1145     83   488  491    244     178      45      4    235
+## 301   2872   821     63   307  340    174     810      99     18   1150
+## 302   1399   357      7   149  161     87     133     371     20    160
+## 303   9778  2732    379  1272 1652    925     398      29      7     NA
+## 304   1546   397     17   226  149    191     160     290     11    425
+## 305   4086  1150     57   579  363    406      65       0      0    900
+## 306   3372  1028     48   604  314    469     270      13      6     NA
+## 307   8396  2402    242  1048 1348    819     167      18      6    500
+## 308   1359   355     31   180  148    158     133     173      9    278
+## 309   3031   771    110   338  406    239      94     270     16    750
+## 310   1236   309      1   201   69    110     300      12      9    160
+## 311   2728   753     69   399  366    286    1182      96     13   1300
+## 312   2268   566     41   279  257    246     170     284      3    525
+## 313   1775   506      6   272  125    194     186     290     17    550
+## 314   2778   978     32   474  322    417     121     267     19   1600
+## 315    408   117     11    66   41     34     942      72     11    120
+## 316    593   172     22    82  100     57    1222     139     15    165
+## 317   1063   283     15   107  124    106     325      58      6     NA
+## 318   2703   806     32   379  311    138     325       9      3    700
+## 319   5511  1511     39   897  451    875     313     381     20    875
+## 320   1700   433      7   217   93    146      37     113      7    385
+## 321   3198   857     97   470  420    332    1314     131     12    960
+## 322   4908  1457     30   775  357    249     408       4      3   1000
+##       logSal
+## 1         NA
+## 2   2.676694
+## 3   2.681241
+## 4   2.698970
+## 5   1.963788
+## 6   2.875061
+## 7   1.845098
+## 8   2.000000
+## 9   1.875061
+## 10  3.041393
+## 11  2.713491
+## 12  2.710117
+## 13  2.740363
+## 14  2.845098
+## 15  2.380211
+## 16        NA
+## 17  2.889302
+## 18  2.243038
+## 19        NA
+## 20  2.130334
+## 21  2.000000
+## 22  2.060698
+## 23        NA
+## 24  2.778151
+## 25  2.890421
+## 26  2.883661
+## 27  2.850033
+## 28  2.875061
+## 29  2.795880
+## 30  2.954243
+## 31        NA
+## 32  2.041393
+## 33        NA
+## 34  2.787460
+## 35  2.477121
+## 36  2.929419
+## 37        NA
+## 38  1.954243
+## 39        NA
+## 40        NA
+## 41  1.832509
+## 42        NA
+## 43        NA
+## 44  2.255273
+## 45        NA
+## 46  2.484300
+## 47  2.332438
+## 48  2.394452
+## 49        NA
+## 50  2.911158
+## 51  2.942008
+## 52  1.845098
+## 53        NA
+## 54  3.079181
+## 55  2.829304
+## 56  2.618048
+## 57  2.531479
+## 58        NA
+## 59  2.620136
+## 60  3.130334
+## 61  1.954243
+## 62  2.439333
+## 63  2.361728
+## 64  2.352183
+## 65        NA
+## 66  2.977724
+## 67        NA
+## 68  1.875061
+## 69  2.021189
+## 70        NA
+## 71  2.505150
+## 72        NA
+## 73  2.929419
+## 74  2.728354
+## 75  2.969882
+## 76  2.929419
+## 77  2.322219
+## 78        NA
+## 79  2.511883
+## 80  2.439333
+## 81        NA
+## 82  2.653213
+## 83  3.295567
+## 84        NA
+## 85  3.278754
+## 86  2.778151
+## 87  3.017868
+## 88  2.041393
+## 89  2.414973
+## 90  2.676694
+## 91  2.635484
+## 92  3.086360
+## 93  1.845098
+## 94  2.161368
+## 95        NA
+## 96  2.774517
+## 97  3.269746
+## 98        NA
+## 99  2.477121
+## 100 2.690196
+## 101 3.390935
+## 102       NA
+## 103 2.574031
+## 104       NA
+## 105       NA
+## 106       NA
+## 107       NA
+## 108 2.875061
+## 109 3.070038
+## 110 1.845098
+## 111 3.176091
+## 112 2.585461
+## 113 3.284656
+## 114 2.332438
+## 115       NA
+## 116 2.954243
+## 117 2.190332
+## 118 2.845098
+## 119 2.728354
+## 120 2.559907
+## 121 2.865104
+## 122 2.301030
+## 123 2.602060
+## 124 2.602060
+## 125 2.868056
+## 126       NA
+## 127 2.698970
+## 128 2.778151
+## 129 2.821514
+## 130 2.977724
+## 131 2.875061
+## 132 2.474216
+## 133 2.511883
+## 134 1.944483
+## 135 2.243038
+## 136 1.954243
+## 137 3.092721
+## 138 2.633468
+## 139       NA
+## 140 2.000000
+## 141 2.217484
+## 142 2.397940
+## 143 3.113943
+## 144 2.888179
+## 145       NA
+## 146 3.003461
+## 147 2.439333
+## 148 2.889302
+## 149 2.929419
+## 150 2.562293
+## 151       NA
+## 152 1.977724
+## 153 2.041393
+## 154 2.000000
+## 155 2.444045
+## 156 1.903090
+## 157 2.778151
+## 158       NA
+## 159       NA
+## 160 2.301030
+## 161       NA
+## 162 2.817565
+## 163 1.875061
+## 164 3.382557
+## 165 2.397940
+## 166 2.190332
+## 167 2.806180
+## 168 2.477121
+## 169 2.041393
+## 170       NA
+## 171 2.916454
+## 172       NA
+## 173 2.290035
+## 174       NA
+## 175 2.653213
+## 176 2.799341
+## 177 1.939519
+## 178 3.113943
+## 179 3.000000
+## 180 3.255273
+## 181 3.117271
+## 182 2.868056
+## 183 2.795880
+## 184 2.096910
+## 185 3.018284
+## 186 2.860338
+## 187 2.477121
+## 188 2.562293
+## 189 1.875061
+## 190 3.072985
+## 191 2.307496
+## 192 2.352183
+## 193 2.720159
+## 194 2.423246
+## 195 2.896526
+## 196 2.903090
+## 197 2.769377
+## 198       NA
+## 199 2.161368
+## 200       NA
+## 201 2.623249
+## 202 1.875061
+## 203 2.759668
+## 204       NA
+## 205 2.892095
+## 206 1.954243
+## 207 2.176091
+## 208 2.845098
+## 209       NA
+## 210 2.740363
+## 211       NA
+## 212 2.812913
+## 213 1.832509
+## 214 2.000000
+## 215 2.826075
+## 216 2.243038
+## 217 2.136721
+## 218 3.327767
+## 219 2.942008
+## 220 2.079181
+## 221 2.146128
+## 222 2.322219
+## 223 2.903090
+## 224 2.380211
+## 225 2.544068
+## 226       NA
+## 227 2.243038
+## 228 2.301030
+## 229       NA
+## 230 3.287802
+## 231 2.845098
+## 232 2.875061
+## 233 2.653213
+## 234 2.235528
+## 235 3.100371
+## 236       NA
+## 237 2.875061
+## 238 2.278754
+## 239 2.763428
+## 240 2.113943
+## 241 2.653213
+## 242 2.477121
+## 243 2.397940
+## 244 3.021189
+## 245 2.332438
+## 246 2.602060
+## 247       NA
+## 248 2.748188
+## 249 3.222716
+## 250 2.688420
+## 251       NA
+## 252 2.628389
+## 253 2.698970
+## 254       NA
+## 255       NA
+## 256 2.397940
+## 257 2.602060
+## 258 2.653213
+## 259 2.875061
+## 260 1.845098
+## 261 2.942008
+## 262 2.278754
+## 263 2.281033
+## 264 2.869232
+## 265 2.397940
+## 266 2.146128
+## 267 1.991226
+## 268 2.869232
+## 269 2.146128
+## 270 2.534026
+## 271       NA
+## 272 3.000000
+## 273 2.000000
+## 274 1.954243
+## 275 2.301030
+## 276 2.130334
+## 277 2.190332
+## 278 2.676694
+## 279 3.161368
+## 280 2.176091
+## 281 2.021189
+## 282 2.544068
+## 283 1.954243
+## 284       NA
+## 285 2.724276
+## 286 2.534026
+## 287 2.973128
+## 288 2.544068
+## 289 2.514548
+## 290 2.397940
+## 291 2.869232
+## 292 2.628389
+## 293       NA
+## 294 2.966142
+## 295 2.267172
+## 296 2.963788
+## 297 2.457882
+## 298 2.389166
+## 299       NA
+## 300 2.371068
+## 301 3.060698
+## 302 2.204120
+## 303       NA
+## 304 2.628389
+## 305 2.954243
+## 306       NA
+## 307 2.698970
+## 308 2.444045
+## 309 2.875061
+## 310 2.204120
+## 311 3.113943
+## 312 2.720159
+## 313 2.740363
+## 314 3.204120
+## 315 2.079181
+## 316 2.217484
+## 317       NA
+## 318 2.845098
+## 319 2.942008
+## 320 2.585461
+## 321 2.982271
+## 322 3.000000</code></pre>
+<pre class="r"><code>corrgram(
+  baseball[,c(&quot;Assists&quot;,&quot;Atbat&quot;,&quot;Errors&quot;,&quot;Hits&quot;,&quot;Homer&quot;,&quot;logSal&quot;,
+           &quot;Putouts&quot;,&quot;RBI&quot;,&quot;Runs&quot;,&quot;Walks&quot;,&quot;Years&quot;)], 
+  order=TRUE, main=&quot;Baseball data PC2/PC1 order&quot;,
+  lower.panel=panel.shade, upper.panel=panel.pie)</code></pre>
+<p><img src="/post/2021-12-01-hwmis-r_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>

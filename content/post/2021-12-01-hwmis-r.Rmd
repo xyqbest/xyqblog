@@ -1,4 +1,16 @@
 ---
+title: HWMIS培训 - R与回归
+author: Yuquan Xu
+date: '2021-12-01'
+slug: hwmis-r
+categories:
+  - 组会分享
+  - R
+tags:
+  - R
+disable_comments: yes
+---
+---
 title: HWMIS培训-R与回归
 author: Yuquan Xu
 date: '2021-12-01'
@@ -36,7 +48,7 @@ RStudio（[https://www.rstudio.com/](https://www.rstudio.com/)）是功能更强
 - Hadley Wickham(2019) “Advanced R,” 2nd ed., [https://adv-r.hadley.nz/](https://adv-r.hadley.nz/), Chapman & Hall/CRC The R Series，高级R编程，属于对R高级编程技术的讲解。
 - Hadley Wickham(2016) ggplot2 Elegant Graphics for Data Analysis, 2nd ed., [https://ggplot2-book.org/](https://ggplot2-book.org/), Springer，优雅易用的R作图功能。
 - Susan Holmes, Wolfgang Huber(2020) Modern Statistics for Modern Biology, [https://www.huber.embl.de/msmb/index.html](https://www.huber.embl.de/msmb/index.html), R的统计功能在生物学中的应用
-- R语言教程[https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html](https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html)
+- R语言教程[https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html](https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/stat-reg.html)本教程的搬运
 
 ```{r}
 load(url("https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/data/reg-data.RData"))
@@ -44,6 +56,8 @@ load(url("https://www.math.pku.edu.cn/teachers/lidf/docs/Rbook/html/_Rbook/data/
 
 
 ## R进行基本的OLS回归操作
+
+直观上看，要找最优的直线使得直线`$y=ax+b$`与观测到的点最接近。 例如：
 
 ```{r}
 set.seed(1)
@@ -54,6 +68,7 @@ plot(x, y)
 abline(lm(y ~ x), col="red", lwd=2)
 ```
 
+设数据保存在数据框d中，变量名为y和x，用R的lm()函数计算回归
 
 ```{r}
 set.seed(1)
@@ -63,6 +78,9 @@ y <- 20 + 0.5*x + rnorm(nsamp,0,0.5)
 d <- data.frame(x=x, y=y)
 lm1 <- lm(y ~ x, data=d); lm1
 ```
+
+结果只有回归系数。需要用summary()显示较详细的结果。如
+
 ```{r}
 summary(lm1)
 ```
@@ -81,35 +99,94 @@ summary(lm2)
 
 ## OLS回归的诊断
 
-[R语言统计-回归篇：回归诊断](https://zhuanlan.zhihu.com/p/341318994)
+参考[R语言统计-回归篇：回归诊断](https://zhuanlan.zhihu.com/p/341318994)
 
-- __线性__ 若因变量与自变量线性相关，那么残差值与预测（拟合）值就没有任何系统关联。 换句话说，除了白噪声，模型应该包含数据中所有的系统方差。在“残差图与拟合图” （Residuals vs Fitted，左上）中可以清楚地看到一个曲线关系，这暗示着你可能需要对回 归模型加上一个二次项。
+经典线性模型假定
 
-- __独立性__ 你无法从这些图中分辨出因变量值是否相互独立，只能从收集的数据中来验证。 上面的例子中，没有任何先验的理由去相信一位女性的体重会影响另外一位女性的体重。 假若你发现数据是从一个家庭抽样得来的，那么可能必须要调整模型独立性的假设。
+- MLR.1 线性于参数
+- MLR.2 随机抽样
+- MLR.3 不存在完全共线性
+- MLR.4 条件均值为零
+- MLR.5 同方差性
+- MLR.6 正态性
 
-- __正态性__ 当预测变量值固定时，因变量成正态分布，则残差值（预测与真实的差值）也应该是一个均值为0的正态分布。“正态Q-Q图”（Normal Q-Q，右上）是在正态分布对应的值下，标准化残差的概图。若满足正态假设，那么图上的点应该落在呈45度角的直线上；若不是如此，那么 就违反了正态性的假设。
+1~4 保证OLS估计无偏
 
-- __同方差性__ 若满足不变方差假设，那么在“位置尺度图”（Scale-Location Graph，左下） 中，水平线周围的点应该随机分布。该图似乎满足此假设。 最后一幅“残差与杠杆图”（Residuals vs Leverage，右下）提供了你可能关注的单个观测点的信息。从图形可以鉴别出离群点、高杠杆值点和强影响点。
+5 保证OLS估计是无偏估计中方差最小的
+
+6 保证t统计量和F统计量的假设检验
+
+
+
+<!-- - __随机抽样__ -->
+
+<!-- - __线性__ 若因变量与自变量线性相关，那么残差值与预测（拟合）值就没有任何系统关联。 换句话说，除了白噪声，模型应该包含数据中所有的系统方差。在“残差图与拟合图” （Residuals vs Fitted，左上）中可以清楚地看到一个曲线关系，这暗示着你可能需要对回 归模型加上一个二次项。 -->
+
+<!-- - __独立性__ 你无法从这些图中分辨出因变量值是否相互独立，只能从收集的数据中来验证。 上面的例子中，没有任何先验的理由去相信一位女性的体重会影响另外一位女性的体重。 假若你发现数据是从一个家庭抽样得来的，那么可能必须要调整模型独立性的假设。 -->
+
+<!-- - __正态性__ 当预测变量值固定时，因变量成正态分布，则残差值（预测与真实的差值）也应该是一个均值为0的正态分布。“正态Q-Q图”（Normal Q-Q，右上）是在正态分布对应的值下，标准化残差的概图。若满足正态假设，那么图上的点应该落在呈45度角的直线上；若不是如此，那么 就违反了正态性的假设。 -->
+
+<!-- - __同方差性__ 若满足不变方差假设，那么在“位置尺度图”（Scale-Location Graph，左下） 中，水平线周围的点应该随机分布。该图似乎满足此假设。 最后一幅“残差与杠杆图”（Residuals vs Leverage，右下）提供了你可能关注的单个观测点的信息。从图形可以鉴别出离群点、高杠杆值点和强影响点。 -->
 
 
 ```{r}
 plot(lm2)
 ```
+
 第一幅图是残差对预测值散点图， 散点应该随机在0线上下波动，不应该有曲线模式、分散程度增大模式、 特别突出的离群点等情况。
 
 第二幅图是残差的正态QQ图， 散点接近于直线时可以认为模型误差项的正态分布假定是合理的。
 
 第三幅图是误差大小(标准化残差绝对值的平方根)对拟合值的图形， 可以判断方差齐性假设(方差
-`$\sigma$`不变)。
+`$\sigma$`不变)。如果满足同方差性，那么图中水平线周围的点应该随机分布。
 
 第四个幅是残差对杠杆量图，并叠加了Cook距离等值线。 杠杆量代表了回归自变量对结果的影响大小， 超过`$4/n$`的值是需要重视的。 Cook距离考察删去第个观测对回归结果的影响， 如果有超出两条虚线范围之外的点， 就可能是强影响点。
 
 
+更多资料可以百度，以及其它的R包，比如car。
 
-下面来详细介绍。
-一个观测点是离群点，表明拟合回归模型对其预测效果不佳（产生了巨大的或正或负的残差）
-一个观测点有很高的杠杆值，表明它是一个异常的预测变量值的组合。也就是说，在预测变量空间中，它是一个离群点。因变量值不参与计算一个观测点的杠杆值。
-一个观测点是强影响点（influential observation），表明它对模型参数的估计产生的影响过大，非常不成比例。强影响点可以通过Cook距离即Cook‘s D统计量来鉴别。
+## R可视化
+
+变量相关性矩阵
+
+1986 年 322 名美国职业棒球大联盟的常规和替补击球手的数据。 
+
+- Atbat: Number of times at bat in 1986
+
+- Hits: Number of hits in 1986
+
+- Homer: Number of home runs in 1986
+
+- Runs: Number of runs in 1986
+
+- RBI: Runs batted in during 1986
+
+- Walks: Number of walks in 1986
+
+- Years: Number of years in the major leagues
+
+- Atbatc: Number of times at bat in his career
+
+- Putouts: Number of putouts in 1986
+
+- Assists: Number of assists in 1986
+
+- Errors: Number of errors in 1986
+
+- logSal: Log of salary
+
+```{r,warning=FALSE}
+library(corrgram)
+baseball
+```
 
 
-## R的绘图
+```{r, warning=FALSE}
+corrgram(
+  baseball[,c("Assists","Atbat","Errors","Hits","Homer","logSal",
+           "Putouts","RBI","Runs","Walks","Years")], 
+  order=TRUE, main="Baseball data PC2/PC1 order",
+  lower.panel=panel.shade, upper.panel=panel.pie)
+```
+
+
