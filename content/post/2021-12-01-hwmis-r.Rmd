@@ -76,7 +76,8 @@ nsamp <- 30
 x <- runif(nsamp, -10, 10)
 y <- 20 + 0.5*x + rnorm(nsamp,0,0.5)
 d <- data.frame(x=x, y=y)
-lm1 <- lm(y ~ x, data=d); lm1
+lm1 <- lm(y ~ x, data=d)
+lm1
 ```
 
 结果只有回归系数。需要用summary()显示较详细的结果。如
@@ -87,7 +88,7 @@ summary(lm1)
 对d.class数据集，建立体重对身高的回归方程:
 
 ```{r}
-d.class
+knitr::kable(head(d.class,10))
 ```
 
 
@@ -177,7 +178,7 @@ plot(lm2)
 
 ```{r,warning=FALSE}
 library(corrgram)
-baseball
+knitr::kable(head(baseball,10))
 ```
 
 
@@ -188,5 +189,41 @@ corrgram(
   order=TRUE, main="Baseball data PC2/PC1 order",
   lower.panel=panel.shade, upper.panel=panel.pie)
 ```
+
+ggplot2 绘图系统
+
+```{r,warning=FALSE}
+library(ggplot2)
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class)) + 
+  geom_smooth()
+```
+
+
+```{r}
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+```
+
+```{r}
+bar <- ggplot(data = diamonds) + 
+  geom_bar(
+    mapping = aes(x = cut, fill = cut), 
+    show.legend = FALSE,
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+bar + coord_flip()
+bar + coord_polar()
+```
+
+## 各种各样的主题
+
+参见[ggplot2 extensions - gallery](https://exts.ggplot2.tidyverse.org/gallery/)
+
+
+
 
 
